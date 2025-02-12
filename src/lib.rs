@@ -24,7 +24,10 @@ use embedded_hal::i2c::I2c;
 #[cfg(feature = "async")]
 use embedded_hal_async::i2c::I2c;
 
-use registers::Register;
+use registers::{
+    Register, CONSECUTIVE_FAULT_MASK, CONSECUTIVE_FAULT_SHIFT, CONVERSION_RATE_MASK,
+    CONVERSION_RATE_SHIFT,
+};
 
 pub use register_settings::*;
 
@@ -55,6 +58,27 @@ impl<I2C: I2c> Tmp1075<I2C> {
         self.read_reg(Register::TEMP).await
     }
 
+    /// Set the conversion rate
+    /// See the [datasheet (section 7.5.1.2)](https://www.ti.com/lit/gpn/tmp1075) for more info.
+    pub async fn set_conversion_rate(&mut self, rate: ConversionRate) -> Result<(), I2C::Error> {
+        self.modify_reg(Register::CFGR, |v| {
+            v & !CONVERSION_RATE_MASK | (rate as u16) << CONVERSION_RATE_SHIFT
+        })
+        .await
+    }
+
+    /// Set the number of consecutive fault measurements to trigger the alert function
+    /// See the [datasheet (section 7.5.1.2)](https://www.ti.com/lit/gpn/tmp1075) for more info.
+    pub async fn set_consecutive_faults(
+        &mut self,
+        faults: ConsecutiveFaults,
+    ) -> Result<(), I2C::Error> {
+        self.modify_reg(Register::CFGR, |v| {
+            v & !CONSECUTIVE_FAULT_MASK | (faults as u16) << CONSECUTIVE_FAULT_SHIFT
+        })
+        .await
+    }
+
     #[inline]
     async fn read_reg(&mut self, reg: Register) -> Result<u16, I2C::Error> {
         let mut data = [0_u8; 2];
@@ -63,5 +87,32 @@ impl<I2C: I2c> Tmp1075<I2C> {
             .await?;
 
         Ok(0)
+    }
+
+    #[inline]
+    async fn write_reg(&mut self, reg: Register, data: u16) -> Result<(), I2C::Error> {
+        let bytes = data.to_be_bytes();
+        let buffer = [reg.addr(), bytes[0], bytes[1]];
+        self.bus.write(self.address, &buffer).await
+    }
+
+    #[inline]
+    async fn modify_reg<F: FnOnce(u16) -> u16>(
+        &mut self,
+        reg: Register,
+        f: F,
+    ) -> Result<(), I2C::Error> {
+        let r = self.read_reg(reg).await?;
+        self.write_reg(reg, f(r)).await
+    }
+
+    #[inline]
+    async fn reg_set_bits(&mut self, reg: Register, mask: u16) -> Result<(), I2C::Error> {
+        self.modify_reg(reg, |r| r | mask).await
+    }
+
+    #[inline]
+    async fn reg_reset_bits(&mut self, reg: Register, mask: u16) -> Result<(), I2C::Error> {
+        self.modify_reg(reg, |r| r & !mask).await
     }
 }
