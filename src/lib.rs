@@ -13,6 +13,7 @@ compile_error!("Feature \"blocking\" and feature \"async\" cannot be enabled at 
 #[cfg(not(any(feature = "blocking", feature = "async")))]
 compile_error!("Either feature \"blocking\" or feature \"async\" must be anbled");
 
+mod register_settings;
 mod registers;
 
 const DEFAULT_I2C_ADDRESS: u8 = 0b1001000;
@@ -22,7 +23,10 @@ use embedded_hal::i2c::I2c;
 
 #[cfg(feature = "async")]
 use embedded_hal_async::i2c::I2c;
+
 use registers::Register;
+
+pub use register_settings::*;
 
 /// TMP1075 driver
 #[maybe_async_cfg::maybe(sync(feature = "blocking", keep_self), async(feature = "async"))]
