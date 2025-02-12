@@ -118,6 +118,12 @@ impl<I2C: I2c> Tmp1075<I2C> {
         }
     }
 
+    /// Get the device ID
+    /// See the [datasheet (section 7.5.1.5)](https://www.ti.com/lit/gpn/tmp1075) for more info.
+    pub async fn get_device_id(&mut self) -> Result<u16, I2C::Error> {
+        self.read_reg(Register::DIEID).await
+    }
+
     #[inline]
     async fn read_reg(&mut self, reg: Register) -> Result<u16, I2C::Error> {
         let mut data = [0_u8; 2];
