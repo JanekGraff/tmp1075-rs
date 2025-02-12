@@ -54,7 +54,7 @@ impl<I2C: I2c> Tmp1075<I2C> {
     }
 
     /// Get the temperature
-    pub async fn get_temperature(&mut self) -> Result<u16, I2C::Error> {
+    pub async fn get_temperature_raw(&mut self) -> Result<u16, I2C::Error> {
         self.read_reg(Register::TEMP).await
     }
 
@@ -122,6 +122,12 @@ impl<I2C: I2c> Tmp1075<I2C> {
     /// See the [datasheet (section 7.5.1.5)](https://www.ti.com/lit/gpn/tmp1075) for more info.
     pub async fn get_device_id(&mut self) -> Result<u16, I2C::Error> {
         self.read_reg(Register::DIEID).await
+    }
+
+    fn convert_temperature(raw: u16) -> f32 {
+        let msb = (raw >> 8) as i8;
+        let lsb = (raw & 0xFF00) as i8;
+        ((msb << 8 | lsb) >> 4) as f32 * 0.625
     }
 
     #[inline]
