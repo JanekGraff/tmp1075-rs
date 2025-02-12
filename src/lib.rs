@@ -31,6 +31,12 @@ use registers::{
 
 pub use register_settings::*;
 
+#[cfg(feature = "blocking")]
+pub use crate::Tmp1075;
+
+#[cfg(feature = "async")]
+pub use crate::Tmp1075Async as Tmp1075;
+
 /// TMP1075 driver
 #[maybe_async_cfg::maybe(sync(feature = "blocking", keep_self), async(feature = "async"))]
 pub struct Tmp1075<I2C> {
@@ -53,9 +59,21 @@ impl<I2C: I2c> Tmp1075<I2C> {
         Self { address, bus }
     }
 
-    /// Get the temperature
+    /// Get the temperature as raw value
     pub async fn get_temperature_raw(&mut self) -> Result<u16, I2C::Error> {
         self.read_reg(Register::TEMP).await
+    }
+
+    /// Get the temperature converted to f32
+    pub async fn get_temperature_float(&mut self) -> Result<f32, I2C::Error> {
+        let raw = self.get_temperature_raw().await?;
+        Ok(convert_temperature_float(raw))
+    }
+
+    /// Get the MSB of the temperature as i8
+    pub async fn get_temperature_msb(&mut self) -> Result<i8, I2C::Error> {
+        let raw = self.get_temperature_raw().await?;
+        Ok(convert_temperature_msb(raw))
     }
 
     /// Set the conversion rate
@@ -124,12 +142,6 @@ impl<I2C: I2c> Tmp1075<I2C> {
         self.read_reg(Register::DIEID).await
     }
 
-    fn convert_temperature(raw: u16) -> f32 {
-        let msb = (raw >> 8) as i8;
-        let lsb = (raw & 0xFF00) as i8;
-        ((msb << 8 | lsb) >> 4) as f32 * 0.625
-    }
-
     #[inline]
     async fn read_reg(&mut self, reg: Register) -> Result<u16, I2C::Error> {
         let mut data = [0_u8; 2];
@@ -164,5 +176,44 @@ impl<I2C: I2c> Tmp1075<I2C> {
     #[inline]
     async fn reg_reset_bits(&mut self, reg: Register, mask: u16) -> Result<(), I2C::Error> {
         self.modify_reg(reg, |r| r & !mask).await
+    }
+}
+
+fn convert_temperature_float(raw: u16) -> f32 {
+    // Convert to a signed 16-bit integer by extending the sign bit of the 12-bit value
+    let temp_raw = (raw >> 4) as i16;
+    let temp_signed = if temp_raw & 0x0800 != 0 {
+        // Check if negative (bit 11 set)
+        temp_raw | 0xF000u16 as i16 // Sign extend by setting upper 4 bits to 1
+    } else {
+        temp_raw
+    };
+
+    // Apply the Q4 scaling factor (0.0625 = 1/16)
+    temp_signed as f32 * 0.0625
+}
+
+fn convert_temperature_msb(raw: u16) -> i8 {
+    (raw >> 8) as i8
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{convert_temperature_float, convert_temperature_msb};
+
+    #[test]
+    fn test_msb_temperature_conversion() {
+        for t in i8::MIN as i16..i8::MAX as i16 {
+            let raw = (t << 8) as u16;
+            assert_eq!(convert_temperature_msb(raw), t as i8);
+        }
+    }
+
+    #[test]
+    fn test_float_temperature_conversion() {
+        for t in i8::MIN as i16 + 1..i8::MAX as i16 {
+            let raw = (t << 8) as u16;
+            assert_eq!(convert_temperature_float(raw), t as f32);
+        }
     }
 }
