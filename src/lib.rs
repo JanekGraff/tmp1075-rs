@@ -130,8 +130,7 @@ impl<I2C: I2c> Tmp1075<I2C> {
         self.bus
             .write_read(self.address, &[reg.addr()], &mut data)
             .await?;
-
-        Ok(0)
+        Ok(u16::from_be_bytes(data))
     }
 
     #[inline]
