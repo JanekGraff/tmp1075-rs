@@ -25,8 +25,8 @@ use embedded_hal::i2c::I2c;
 use embedded_hal_async::i2c::I2c;
 
 use registers::{
-    Register, CONSECUTIVE_FAULT_MASK, CONSECUTIVE_FAULT_SHIFT, CONVERSION_RATE_MASK,
-    CONVERSION_RATE_SHIFT,
+    Register, ALERT_FUNCTION_MASK, ALERT_POLARITY_MASK, CONSECUTIVE_FAULT_MASK,
+    CONSECUTIVE_FAULT_SHIFT, CONVERSION_RATE_MASK, CONVERSION_RATE_SHIFT, POWER_MODE_MASK,
 };
 
 pub use register_settings::*;
@@ -77,6 +77,45 @@ impl<I2C: I2c> Tmp1075<I2C> {
             v & !CONSECUTIVE_FAULT_MASK | (faults as u16) << CONSECUTIVE_FAULT_SHIFT
         })
         .await
+    }
+
+    /// Set the polarity of the alert pin
+    /// See the [datasheet (section 7.5.1.2)](https://www.ti.com/lit/gpn/tmp1075) for more info.
+    pub async fn set_alert_polarity(&mut self, polarity: AlertPolarity) -> Result<(), I2C::Error> {
+        match polarity {
+            AlertPolarity::ActiveLow => {
+                self.reg_reset_bits(Register::CFGR, ALERT_POLARITY_MASK)
+                    .await
+            }
+            AlertPolarity::ActiveHigh => {
+                self.reg_set_bits(Register::CFGR, ALERT_POLARITY_MASK).await
+            }
+        }
+    }
+
+    /// Set the function of the alert pin
+    /// See the [datasheet (section 7.5.1.2)](https://www.ti.com/lit/gpn/tmp1075) for more info.
+    pub async fn set_alert_function(&mut self, function: AlertFunction) -> Result<(), I2C::Error> {
+        match function {
+            AlertFunction::ComparatorMode => {
+                self.reg_reset_bits(Register::CFGR, ALERT_FUNCTION_MASK)
+                    .await
+            }
+            AlertFunction::InterruptMode => {
+                self.reg_set_bits(Register::CFGR, ALERT_FUNCTION_MASK).await
+            }
+        }
+    }
+
+    /// Set the power mode
+    /// See the [datasheet (section 7.5.1.2)](https://www.ti.com/lit/gpn/tmp1075) for more info.
+    pub async fn set_power_mode(&mut self, mode: PowerMode) -> Result<(), I2C::Error> {
+        match mode {
+            PowerMode::ContinuousConversion => {
+                self.reg_reset_bits(Register::CFGR, POWER_MODE_MASK).await
+            }
+            PowerMode::ShutdowMode => self.reg_set_bits(Register::CFGR, POWER_MODE_MASK).await,
+        }
     }
 
     #[inline]
