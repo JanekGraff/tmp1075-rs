@@ -1,9 +1,21 @@
 [package]
-edition = "2021"
 name = "tmp1075"
 version = "0.1.0"
+authors = ["Janek Graff <janek.graff@posteo.net"]
+repository = "https://github.com/JanekGraff/tmp1075-rs"
 description = "Platform-independent Rust driver for TMP1075 digital temperature sensor"
 license = "MIT OR Apache-2.0"
+keywords = ["embedded-hal", "no_std", "temperature", "sync", "async"]
+categories = [
+    "embedded",
+    "no-std",
+    "hardware-support",
+    "asynchronous",
+    "no-std::no-alloc",
+]
+edition = "2021"
+
+exclude = [".github"]
 
 [dependencies]
 embedded-hal = { version = "1", optional = true }
