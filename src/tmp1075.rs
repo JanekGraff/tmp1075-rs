@@ -5,7 +5,8 @@ use crate::register_settings::{
 };
 use crate::registers::{
     Register, ALERT_FUNCTION_MASK, ALERT_POLARITY_MASK, CONSECUTIVE_FAULT_MASK,
-    CONSECUTIVE_FAULT_SHIFT, CONVERSION_RATE_MASK, CONVERSION_RATE_SHIFT, POWER_MODE_MASK,
+    CONSECUTIVE_FAULT_SHIFT, CONVERSION_RATE_MASK, CONVERSION_RATE_SHIFT, ONE_SHOT_MASK,
+    POWER_MODE_MASK,
 };
 
 #[cfg(feature = "blocking")]
@@ -117,6 +118,15 @@ impl<I2C: I2c> Tmp1075<I2C> {
     /// See the [datasheet (section 7.5.1.5)](https://www.ti.com/lit/gpn/tmp1075) for more info.
     pub async fn get_device_id(&mut self) -> Result<u16, I2C::Error> {
         self.read_reg(Register::DIEID).await
+    }
+
+    /// Trigger a One-Shot measurement
+    ///
+    /// # NOTE
+    ///
+    /// This only works in while the device is in [`PowerMode::Shutdown`] (see [`Tmp1075::set_power_mode()`](Tmp1075::set_power_mode))
+    pub async fn trigger_one_shot_measurement(&mut self) -> Result<(), I2C::Error> {
+        self.reg_set_bits(Register::CFGR, ONE_SHOT_MASK).await
     }
 
     #[inline]
