@@ -37,6 +37,11 @@ impl<I2C: I2c> Tmp1075<I2C> {
         Self { address, bus }
     }
 
+    /// Destroy the driver returning the interface
+    pub fn destroy(self) -> I2C {
+        self.bus
+    }
+
     /// Get the temperature as raw value
     pub async fn get_temperature_raw(&mut self) -> Result<u16, I2C::Error> {
         self.read_reg(Register::TEMP).await
