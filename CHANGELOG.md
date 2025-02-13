@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix typo in README example (missing `;`)
+
 ## [v0.1.2]
 
 ### Added

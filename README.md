@@ -35,7 +35,7 @@ use tmp1075::Tmp1075;
 
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
-    let p = embassy_stm32::init(Default::default())
+    let p = embassy_stm32::init(Default::default());
 
     let mut i2c_conf = i2c::Config::default();
     i2c_conf.timeout = Duration::from_millis(500);
