@@ -79,10 +79,10 @@ Dual licensed under your choice of either of:
 - Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
 - MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
 
-[crate-image]: TODO
-[crate-link]: TODO
-[docs-image]: TODO
-[docs-link]: TODO
+[crate-image]: https://img.shields.io/crates/v/tmp1075.svg
+[crate-link]: https://crates.io/crates/tmp1075
+[docs-image]: https://docs.rs/tmp1075/badge.svg
+[docs-link]: https://docs.rs/tmp1075/
 [build-image]: https://github.com/JanekGraff/tmp1075-rs/actions/workflows/ci.yml/badge.svg?branch=main
 [build-link]: https://github.com/JanekGraff/tmp1075-rs/actions
 [deps-image]: https://deps.rs/repo/github/janekgraff/tmp1075-rs/status.svg
