@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - Fix typo in README example (missing `;`)
+- Add `ignore` attribute to README example to prevent doctests from failing
 
 ## [v0.1.2]
 

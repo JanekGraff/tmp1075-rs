@@ -23,7 +23,7 @@ Can be used with async and sync I2C interfaces that implement the `embedded_hal`
 
 This example runs the async configuration using embassy on an stm32.
 
-```rust
+```rust,ignore
 use embassy_executor::Spawner;
 use embassy_stm32::{
     i2c,
