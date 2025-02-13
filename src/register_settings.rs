@@ -67,5 +67,5 @@ pub enum PowerMode {
     /// Device is in continuous conversion mode
     ContinuousConversion = 0,
     /// Device is in shutdown mode
-    ShutdowMode = 1,
+    Shutdown = 1,
 }

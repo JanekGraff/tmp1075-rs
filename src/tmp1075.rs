@@ -109,7 +109,7 @@ impl<I2C: I2c> Tmp1075<I2C> {
             PowerMode::ContinuousConversion => {
                 self.reg_reset_bits(Register::CFGR, POWER_MODE_MASK).await
             }
-            PowerMode::ShutdowMode => self.reg_set_bits(Register::CFGR, POWER_MODE_MASK).await,
+            PowerMode::Shutdown => self.reg_set_bits(Register::CFGR, POWER_MODE_MASK).await,
         }
     }
 
