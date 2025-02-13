@@ -125,8 +125,21 @@ impl<I2C: I2c> Tmp1075<I2C> {
     /// # NOTE
     ///
     /// This only works in while the device is in [`PowerMode::Shutdown`] (see [`Tmp1075::set_power_mode()`](Tmp1075::set_power_mode))
+    /// See the [datasheet (section 7.4.2)](https://www.ti.com/lit/gpn/tmp1075) for more info.
     pub async fn trigger_one_shot_measurement(&mut self) -> Result<(), I2C::Error> {
         self.reg_set_bits(Register::CFGR, ONE_SHOT_MASK).await
+    }
+
+    /// Set the MSB of the Low Limit register
+    /// See the [datasheet (section 7.5.1.3 & 7.4.4)](https://www.ti.com/lit/gpn/tmp1075) for more info.
+    pub async fn set_low_limit_msb(&mut self, low_limit: i8) -> Result<(), I2C::Error> {
+        self.write_byte(Register::LLIM, low_limit as u8)
+    }
+
+    /// Set the MSB of the High Limit register
+    /// See the [datasheet (section 7.5.1.3 & 7.4.4)](https://www.ti.com/lit/gpn/tmp1075) for more info.
+    pub async fn set_high_limit_msb(&mut self, high_limit: i8) -> Result<(), I2C::Error> {
+        self.write_byte(Register::HLIM, high_limit as u8)
     }
 
     #[inline]
@@ -142,6 +155,12 @@ impl<I2C: I2c> Tmp1075<I2C> {
     async fn write_reg(&mut self, reg: Register, data: u16) -> Result<(), I2C::Error> {
         let bytes = data.to_be_bytes();
         let buffer = [reg.addr(), bytes[0], bytes[1]];
+        self.bus.write(self.address, &buffer).await
+    }
+
+    #[inline]
+    async fn write_byte(&mut self, reg: Register, byte: u8) -> Result<(), I2C::Error> {
+        let buffer = [reg.addr(), byte];
         self.bus.write(self.address, &buffer).await
     }
 
