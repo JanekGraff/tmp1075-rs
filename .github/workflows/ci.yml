@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    
+env:
+  CARGO_TERM_COLOR: always
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  RUSTFLAGS: "-Dwarnings" # Make sure CI fails on all warnings
+  
+jobs:
+  CI:
+    name: CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        
+      - name: Install components
+        run: rustup component add --toolchain stable rustfmt clippy
+        
+      - name: Format
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
+
+      - name: Run clippy (blocking)
+        run: cargo clippy --no-default-features --features "blocking"
+
+      - name: Run clippy (async)
+        run: cargo clippy --no-default-features --features "async"
+        
+      - name: Run clippy on example
+        run: cd examples/stm32l4-embassy-async && cargo clippy
+        
+      - name: Build example
+        run: cd examples/stm32l4-embassy-async && cargo build
