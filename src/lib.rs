@@ -1,8 +1,7 @@
 //! # TMP1075
 //! A platform agnostic driver to interface with the TMP1075 temperature sensor.
 //! The driver supports async and blocking mode, selectable wit hthe `async` and `blocking` features.
-//!
-
+#![doc = include_str!("../README.md")]
 #![deny(missing_docs)]
 #![deny(warnings)]
 #![forbid(unsafe_code)]
