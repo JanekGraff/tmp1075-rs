@@ -133,13 +133,13 @@ impl<I2C: I2c> Tmp1075<I2C> {
     /// Set the MSB of the Low Limit register
     /// See the [datasheet (section 7.5.1.3 & 7.4.4)](https://www.ti.com/lit/gpn/tmp1075) for more info.
     pub async fn set_low_limit_msb(&mut self, low_limit: i8) -> Result<(), I2C::Error> {
-        self.write_byte(Register::LLIM, low_limit as u8)
+        self.write_byte(Register::LLIM, low_limit as u8).await
     }
 
     /// Set the MSB of the High Limit register
     /// See the [datasheet (section 7.5.1.3 & 7.4.4)](https://www.ti.com/lit/gpn/tmp1075) for more info.
     pub async fn set_high_limit_msb(&mut self, high_limit: i8) -> Result<(), I2C::Error> {
-        self.write_byte(Register::HLIM, high_limit as u8)
+        self.write_byte(Register::HLIM, high_limit as u8).await
     }
 
     #[inline]
