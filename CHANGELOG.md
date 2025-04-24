@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [v0.2.0]
+
+### Changed
+
+- Bump `defmt` from v0.3 to v1.0.
+- Remove `Cargo.lock` from VCS tracking.
+
 ## [v0.1.3]
 
 ### Fixed
@@ -26,7 +33,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Add `destroy()` function returning the bus.
 
-[Unreleased]: https://github.com/JanekGraff/tmp1075-rs/compare/v0.1.3...HEAD
+[Unreleased]: https://github.com/JanekGraff/tmp1075-rs/compare/v0.2.0...HEAD
 [v0.1.1]: https://github.com/JanekGraff/tmp1075-rs/compare/v0.1.0...v0.1.1
 [v0.1.2]: https://github.com/JanekGraff/tmp1075-rs/compare/v0.1.1...v0.1.2
 [v0.1.3]: https://github.com/JanekGraff/tmp1075-rs/compare/v0.1.2...v0.1.3
+[v0.2.0]: https://github.com/JanekGraff/tmp1075-rs/compare/v0.1.3...v0.2.0

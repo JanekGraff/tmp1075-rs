@@ -1,6 +1,6 @@
 [package]
 name = "tmp1075"
-version = "0.1.3"
+version = "0.2.0"
 authors = ["Janek Graff <janek.graff@posteo.net"]
 repository = "https://github.com/JanekGraff/tmp1075-rs"
 description = "Platform-independent Rust driver for TMP1075 digital temperature sensor"
